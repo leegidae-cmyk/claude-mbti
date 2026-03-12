@@ -51,20 +51,18 @@ export function ResultPageClient({ type: rawType }: { type: string }) {
   const handleSaveImage = async () => {
     setSaving(true);
     try {
-      const html2canvas = (await import('html2canvas')).default;
+      const { toPng } = await import('html-to-image');
       const element = document.getElementById('result-card');
       if (!element) throw new Error('Element not found');
 
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: null,
-        logging: false,
+      const dataUrl = await toPng(element, {
+        pixelRatio: 2,
+        cacheBust: true,
       });
 
       const link = document.createElement('a');
       link.download = `typefinder-${typeCode}.png`;
-      link.href = canvas.toDataURL('image/png');
+      link.href = dataUrl;
       link.click();
       toast.success('이미지가 저장되었습니다!');
     } catch {
