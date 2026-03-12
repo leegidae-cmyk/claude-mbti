@@ -5,22 +5,8 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, RotateCcw } from 'lucide-react';
 import { Header } from '@/components/layout/header';
-import { Button } from '@/components/ui/button';
 import { mbtiTypes } from '@/data/mbti-types';
 import { useTestStore } from '@/store/test-store';
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.04 },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
-};
 
 export default function HomePage() {
   const { hasProgress, currentQuestion, resetTest } = useTestStore();
@@ -39,123 +25,113 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Header />
 
-      <main className="max-w-lg mx-auto px-4 py-10">
+      <main className="max-w-2xl mx-auto px-6">
         {/* 이어하기 배너 */}
         {showBanner && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-2xl flex items-center justify-between gap-3"
+            className="mt-6 px-4 py-3 border border-zinc-200 rounded-xl flex items-center justify-between gap-3"
           >
             <div>
-              <p className="text-sm font-semibold text-indigo-800">이어서 테스트하기</p>
-              <p className="text-xs text-indigo-600 mt-0.5">
-                {currentQuestion - 1}/12 완료 · 중단된 테스트가 있어요
-              </p>
+              <p className="text-sm font-medium text-zinc-900">이어서 테스트하기</p>
+              <p className="text-xs text-zinc-500 mt-0.5">{currentQuestion - 1}/12 완료</p>
             </div>
-            <div className="flex gap-2 shrink-0">
+            <div className="flex items-center gap-2 shrink-0">
               <button
-                onClick={() => {
-                  resetTest();
-                  setShowBanner(false);
-                }}
-                className="p-2 text-indigo-400 hover:text-indigo-600 transition-colors"
+                onClick={() => { resetTest(); setShowBanner(false); }}
+                className="p-1.5 text-zinc-400 hover:text-zinc-700 transition-colors"
                 title="테스트 초기화"
               >
-                <RotateCcw size={16} />
+                <RotateCcw size={14} />
               </button>
-              <Link href="/test">
-                <Button size="sm">이어하기</Button>
+              <Link
+                href="/test"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-white bg-zinc-950 px-3 py-1.5 rounded-lg hover:bg-zinc-800 transition-colors"
+              >
+                이어하기
               </Link>
             </div>
           </motion.div>
         )}
 
         {/* 히어로 */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-10"
-        >
-          <span className="inline-block text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full mb-4 tracking-wide">
-            12개 질문 · 무료 · 1분 완성
-          </span>
-          <h1 className="text-4xl font-black text-gray-900 mb-3 leading-tight">
-            당신의 MBTI는?
-          </h1>
-          <p className="text-base text-gray-500 mb-6 leading-relaxed">
-            12개의 핵심 질문으로 나만의 성격 유형을 발견해보세요.
-            <br />
-            당신은 16가지 유형 중 어디에 속할까요?
-          </p>
-
-          {totalCount !== null && (
-            <p className="text-sm text-gray-400 mb-6">
-              지금까지{' '}
-              <span className="font-bold text-indigo-600">
-                {totalCount.toLocaleString()}명
-              </span>
-              이 참여했어요
-            </p>
-          )}
-
-          <Link href="/test">
-            <Button size="lg" className="gap-2 text-base px-8">
-              테스트 시작하기
-              <ArrowRight size={18} />
-            </Button>
-          </Link>
-        </motion.div>
-
-        {/* 16개 유형 그리드 */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-4 gap-2"
-        >
-          {mbtiTypes.map((type) => (
-            <motion.div key={type.code} variants={itemVariants}>
-              <Link href={`/result/${type.code}`}>
-                <div
-                  className="rounded-2xl p-3 text-center cursor-pointer transition-transform hover:scale-105 active:scale-95"
-                  style={{ background: type.color.gradient }}
-                >
-                  <p className="text-base font-black text-white">{type.code}</p>
-                  <p className="text-xs text-white/80 mt-0.5 truncate">{type.nickname}</p>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* 그룹 범례 */}
-        <motion.div
+        <motion.section
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="mt-6 grid grid-cols-2 gap-2"
+          transition={{ duration: 0.5 }}
+          className="pt-20 pb-16"
         >
-          {[
-            { label: '분석가', color: '#6366F1', types: 'INTJ INTP ENTJ ENTP' },
-            { label: '외교관', color: '#EC4899', types: 'INFJ INFP ENFJ ENFP' },
-            { label: '관리자', color: '#0EA5E9', types: 'ISTJ ISFJ ESTJ ESFJ' },
-            { label: '탐험가', color: '#10B981', types: 'ISTP ISFP ESTP ESFP' },
-          ].map((group) => (
-            <div key={group.label} className="flex items-center gap-2 text-xs text-gray-500">
-              <div
-                className="w-3 h-3 rounded-full shrink-0"
-                style={{ backgroundColor: group.color }}
-              />
-              <span className="font-medium text-gray-700">{group.label}</span>
-              <span className="text-gray-400 hidden sm:inline">{group.types}</span>
-            </div>
-          ))}
-        </motion.div>
+          <p className="text-xs font-semibold tracking-widest uppercase text-zinc-400 mb-6">
+            12개 질문 · 무료 · 1분 완성
+          </p>
+          <h1 className="text-6xl font-black tracking-tight text-zinc-950 leading-[1.05] mb-6">
+            당신의<br />MBTI는?
+          </h1>
+          <p className="text-lg text-zinc-500 mb-8 max-w-sm leading-relaxed">
+            12개의 핵심 질문으로 나만의 성격 유형을 발견해보세요.
+          </p>
+          <div className="flex items-center gap-6">
+            <Link
+              href="/test"
+              className="inline-flex items-center gap-2 text-base font-semibold text-white bg-zinc-950 px-6 py-3 rounded-xl hover:bg-zinc-800 transition-colors duration-150"
+            >
+              테스트 시작
+              <ArrowRight size={16} />
+            </Link>
+            {totalCount !== null && (
+              <p className="text-sm text-zinc-400">
+                <span className="font-bold text-zinc-700">{totalCount.toLocaleString()}명</span> 참여
+              </p>
+            )}
+          </div>
+        </motion.section>
+
+        {/* 구분선 */}
+        <div className="border-t border-zinc-100" />
+
+        {/* 16개 유형 */}
+        <section className="py-12">
+          <p className="text-xs font-semibold tracking-widest uppercase text-zinc-400 mb-6">
+            16가지 유형
+          </p>
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="grid grid-cols-4 gap-2"
+          >
+            {mbtiTypes.map((type) => (
+              <Link key={type.code} href={`/result/${type.code}`}>
+                <div
+                  className="rounded-xl p-3 text-center cursor-pointer transition-opacity hover:opacity-80 active:opacity-60"
+                  style={{ background: type.color.gradient }}
+                >
+                  <p className="text-sm font-black text-white">{type.code}</p>
+                  <p className="text-[11px] text-white/80 mt-0.5 truncate">{type.nickname}</p>
+                </div>
+              </Link>
+            ))}
+          </motion.div>
+
+          {/* 그룹 범례 */}
+          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
+            {[
+              { label: '분석가', color: '#6366F1' },
+              { label: '외교관', color: '#EC4899' },
+              { label: '관리자', color: '#0EA5E9' },
+              { label: '탐험가', color: '#10B981' },
+            ].map((group) => (
+              <div key={group.label} className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: group.color }} />
+                <span className="text-xs text-zinc-500">{group.label}</span>
+              </div>
+            ))}
+          </div>
+        </section>
       </main>
     </div>
   );

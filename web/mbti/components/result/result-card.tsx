@@ -14,56 +14,33 @@ export function ResultCard({ typeData, result }: ResultCardProps) {
   return (
     <div
       id="result-card"
-      className="rounded-3xl overflow-hidden shadow-xl"
+      className="rounded-2xl overflow-hidden"
       style={{ background: typeData.color.gradient }}
     >
-      {/* 헤더 영역 */}
-      <div className="p-8 text-white text-center">
-        <p className="text-sm font-semibold opacity-80 mb-1 tracking-widest uppercase">
+      {/* 헤더 */}
+      <div className="px-8 pt-10 pb-8 text-white">
+        <p className="text-xs font-bold tracking-widest uppercase opacity-60 mb-4">
           {typeData.group}형
         </p>
-        <h1 className="text-7xl font-black mb-3 tracking-tight">{typeData.code}</h1>
-        <h2 className="text-2xl font-bold mb-2">{typeData.nickname}</h2>
-        <p className="text-base opacity-90 font-medium leading-relaxed">{typeData.tagline}</p>
+        <h1 className="text-8xl font-black tracking-tight leading-none mb-4">{typeData.code}</h1>
+        <h2 className="text-xl font-bold mb-2">{typeData.nickname}</h2>
+        <p className="text-sm opacity-80 leading-relaxed">{typeData.tagline}</p>
       </div>
 
-      {/* 콘텐츠 영역 */}
-      <div className="bg-white mx-3 mb-3 rounded-2xl p-6 space-y-6">
-        {/* 설명 */}
-        <p className="text-gray-700 text-sm leading-relaxed">{typeData.description}</p>
+      {/* 콘텐츠 */}
+      <div className="bg-white mx-2 mb-2 rounded-xl p-6 space-y-5">
+        <p className="text-sm text-zinc-600 leading-relaxed">{typeData.description}</p>
 
-        {/* 축 퍼센트 바 */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-bold text-gray-900">성격 지표</h3>
-          <AxisBar
-            leftLabel="외향(E)"
-            rightLabel="내향(I)"
-            leftPercent={percentages.E}
-            color={typeData.color.primary}
-          />
-          <AxisBar
-            leftLabel="감각(S)"
-            rightLabel="직관(N)"
-            leftPercent={percentages.S}
-            color={typeData.color.primary}
-          />
-          <AxisBar
-            leftLabel="사고(T)"
-            rightLabel="감정(F)"
-            leftPercent={percentages.T}
-            color={typeData.color.primary}
-          />
-          <AxisBar
-            leftLabel="판단(J)"
-            rightLabel="인식(P)"
-            leftPercent={percentages.J}
-            color={typeData.color.primary}
-          />
+        <div className="space-y-3 pt-4 border-t border-zinc-100">
+          <p className="text-xs font-bold tracking-widest uppercase text-zinc-400">성격 지표</p>
+          <AxisBar leftLabel="외향(E)" rightLabel="내향(I)" leftPercent={percentages.E} color={typeData.color.primary} />
+          <AxisBar leftLabel="감각(S)" rightLabel="직관(N)" leftPercent={percentages.S} color={typeData.color.primary} />
+          <AxisBar leftLabel="사고(T)" rightLabel="감정(F)" leftPercent={percentages.T} color={typeData.color.primary} />
+          <AxisBar leftLabel="판단(J)" rightLabel="인식(P)" leftPercent={percentages.J} color={typeData.color.primary} />
         </div>
 
-        {/* 서비스 URL */}
-        <div className="text-center pt-2 border-t border-gray-100">
-          <p className="text-xs text-gray-400">typefinder.app</p>
+        <div className="pt-3 border-t border-zinc-100 text-center">
+          <p className="text-xs text-zinc-300 font-medium tracking-wider">typefinder.app</p>
         </div>
       </div>
     </div>

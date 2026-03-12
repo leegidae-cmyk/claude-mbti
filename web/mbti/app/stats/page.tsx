@@ -3,9 +3,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowRight, Users } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Header } from '@/components/layout/header';
-import { Button } from '@/components/ui/button';
 import { mbtiTypeMap } from '@/data/mbti-types';
 import { MbtiCode } from '@/types/mbti';
 
@@ -28,65 +27,53 @@ export default function StatsPage() {
   useEffect(() => {
     fetch('/api/stats')
       .then((r) => r.json())
-      .then((data) => {
-        setStats(data);
-        setLoading(false);
-      })
+      .then((data) => { setStats(data); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
 
-  const maxCount = stats
-    ? Math.max(...Object.values(stats.distribution))
-    : 1;
+  const maxCount = stats ? Math.max(...Object.values(stats.distribution)) : 1;
 
-  // 축별 비율 계산
-  const axisStats = stats
-    ? (() => {
-        let E = 0, I = 0, S = 0, N = 0, T = 0, F = 0, J = 0, P = 0;
-        (Object.entries(stats.distribution) as [MbtiCode, number][]).forEach(([code, count]) => {
-          if (code[0] === 'E') E += count; else I += count;
-          if (code[1] === 'S') S += count; else N += count;
-          if (code[2] === 'T') T += count; else F += count;
-          if (code[3] === 'J') J += count; else P += count;
-        });
-        const total = stats.total;
-        return { E, I, S, N, T, F, J, P, total };
-      })()
-    : null;
+  const axisStats = stats ? (() => {
+    let E = 0, I = 0, S = 0, N = 0, T = 0, F = 0, J = 0, P = 0;
+    (Object.entries(stats.distribution) as [MbtiCode, number][]).forEach(([code, count]) => {
+      if (code[0] === 'E') E += count; else I += count;
+      if (code[1] === 'S') S += count; else N += count;
+      if (code[2] === 'T') T += count; else F += count;
+      if (code[3] === 'J') J += count; else P += count;
+    });
+    return { E, I, S, N, T, F, J, P, total: stats.total };
+  })() : null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Header />
 
-      <main className="max-w-lg mx-auto px-4 py-8">
+      <main className="max-w-2xl mx-auto px-6 py-12">
+        {/* 헤더 */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8 text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mb-12"
         >
-          <div className="inline-flex items-center gap-2 mb-2">
-            <Users size={20} className="text-indigo-600" />
-            <h1 className="text-2xl font-bold text-gray-900">유형별 통계</h1>
-          </div>
+          <p className="text-xs font-semibold tracking-widest uppercase text-zinc-400 mb-3">통계</p>
+          <h1 className="text-5xl font-black text-zinc-950 tracking-tight leading-[1.05]">
+            유형별<br />분포
+          </h1>
           {stats && (
-            <p className="text-sm text-gray-500">
-              총{' '}
-              <span className="font-bold text-indigo-600">
-                {stats.total.toLocaleString()}명
-              </span>
-              의 결과
+            <p className="text-zinc-500 mt-3 text-sm">
+              총 <span className="font-bold text-zinc-950">{stats.total.toLocaleString()}명</span>의 결과
             </p>
           )}
         </motion.div>
 
         {loading ? (
-          <div className="text-center py-20 text-gray-400">통계를 불러오는 중...</div>
+          <div className="py-20 text-center text-sm text-zinc-400">불러오는 중...</div>
         ) : stats ? (
           <>
-            {/* 유형별 막대 차트 */}
-            <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm mb-4">
-              <h2 className="text-base font-bold text-gray-900 mb-4">유형별 분포</h2>
-              <div className="space-y-2.5">
+            {/* 유형별 바 차트 */}
+            <section className="mb-12">
+              <p className="text-xs font-semibold tracking-widest uppercase text-zinc-400 mb-5">유형별 분포</p>
+              <div className="space-y-2">
                 {GROUP_ORDER.map((code, index) => {
                   const count = stats.distribution[code] ?? 0;
                   const percentage = ((count / stats.total) * 100).toFixed(1);
@@ -96,27 +83,27 @@ export default function StatsPage() {
                   return (
                     <motion.div
                       key={code}
-                      initial={{ opacity: 0, x: -20 }}
+                      initial={{ opacity: 0, x: -12 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.04 }}
+                      transition={{ delay: index * 0.03 }}
                     >
                       <Link href={`/result/${code}`} className="block group">
                         <div className="flex items-center gap-3">
-                          <span className="w-12 text-xs font-bold text-gray-700 shrink-0">{code}</span>
-                          <div className="flex-1 relative h-7 bg-gray-100 rounded-lg overflow-hidden">
+                          <span className="w-11 text-xs font-bold text-zinc-700 shrink-0">{code}</span>
+                          <div className="flex-1 relative h-6 bg-zinc-50 rounded-lg overflow-hidden">
                             <motion.div
                               initial={{ width: 0 }}
                               animate={{ width: `${barWidth}%` }}
-                              transition={{ duration: 0.8, delay: index * 0.04, ease: 'easeOut' }}
-                              className="absolute inset-y-0 left-0 rounded-lg"
+                              transition={{ duration: 0.7, delay: index * 0.03, ease: 'easeOut' }}
+                              className="absolute inset-y-0 left-0 rounded-lg opacity-70 group-hover:opacity-100 transition-opacity"
                               style={{ backgroundColor: typeData.color.primary }}
                             />
-                            <span className="absolute inset-y-0 right-2 flex items-center text-xs font-semibold text-gray-600">
+                            <span className="absolute inset-y-0 right-2 flex items-center text-xs font-medium text-zinc-600">
                               {percentage}%
                             </span>
                           </div>
-                          <span className="w-16 text-xs text-gray-500 text-right shrink-0">
-                            {count.toLocaleString()}명
+                          <span className="w-14 text-xs text-zinc-400 text-right shrink-0">
+                            {count.toLocaleString()}
                           </span>
                         </div>
                       </Link>
@@ -124,46 +111,42 @@ export default function StatsPage() {
                   );
                 })}
               </div>
-            </div>
+            </section>
 
             {/* 축별 비율 */}
             {axisStats && (
-              <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm mb-6">
-                <h2 className="text-base font-bold text-gray-900 mb-4">성격 축 비율</h2>
-                <div className="space-y-4">
+              <section className="mb-12">
+                <p className="text-xs font-semibold tracking-widest uppercase text-zinc-400 mb-5">성격 축 비율</p>
+                <div className="space-y-6">
                   {[
-                    { left: 'E', right: 'I', leftLabel: '외향(E)', rightLabel: '내향(I)', leftCount: axisStats.E, rightCount: axisStats.I, color: '#6366F1' },
-                    { left: 'S', right: 'N', leftLabel: '감각(S)', rightLabel: '직관(N)', leftCount: axisStats.S, rightCount: axisStats.N, color: '#EC4899' },
-                    { left: 'T', right: 'F', leftLabel: '사고(T)', rightLabel: '감정(F)', leftCount: axisStats.T, rightCount: axisStats.F, color: '#0EA5E9' },
-                    { left: 'J', right: 'P', leftLabel: '판단(J)', rightLabel: '인식(P)', leftCount: axisStats.J, rightCount: axisStats.P, color: '#10B981' },
+                    { left: 'E', leftLabel: '외향(E)', rightLabel: '내향(I)', leftCount: axisStats.E, rightCount: axisStats.I, color: '#6366F1' },
+                    { left: 'S', leftLabel: '감각(S)', rightLabel: '직관(N)', leftCount: axisStats.S, rightCount: axisStats.N, color: '#EC4899' },
+                    { left: 'T', leftLabel: '사고(T)', rightLabel: '감정(F)', leftCount: axisStats.T, rightCount: axisStats.F, color: '#0EA5E9' },
+                    { left: 'J', leftLabel: '판단(J)', rightLabel: '인식(P)', leftCount: axisStats.J, rightCount: axisStats.P, color: '#10B981' },
                   ].map((axis) => {
                     const total = axis.leftCount + axis.rightCount;
                     const leftPct = Math.round((axis.leftCount / total) * 100);
                     const rightPct = 100 - leftPct;
                     return (
-                      <div key={axis.left} className="space-y-1.5">
-                        <div className="flex justify-between text-sm font-semibold">
-                          <span className={leftPct >= rightPct ? 'text-gray-900' : 'text-gray-400'}>
+                      <div key={axis.left}>
+                        <div className="flex justify-between text-sm font-semibold mb-2">
+                          <span className={leftPct >= rightPct ? 'text-zinc-950' : 'text-zinc-300'}>
                             {axis.leftLabel}
                           </span>
-                          <span className={rightPct > leftPct ? 'text-gray-900' : 'text-gray-400'}>
+                          <span className={rightPct > leftPct ? 'text-zinc-950' : 'text-zinc-300'}>
                             {axis.rightLabel}
                           </span>
                         </div>
-                        <div className="h-3 bg-gray-100 rounded-full overflow-hidden flex">
+                        <div className="h-1.5 bg-zinc-100 rounded-full overflow-hidden">
                           <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${leftPct}%` }}
-                            transition={{ duration: 0.8, ease: 'easeOut' }}
-                            className="h-full rounded-l-full"
+                            transition={{ duration: 0.7, ease: 'easeOut' }}
+                            className="h-full rounded-full"
                             style={{ backgroundColor: axis.color }}
                           />
-                          <div
-                            className="h-full flex-1 rounded-r-full"
-                            style={{ backgroundColor: axis.color + '33' }}
-                          />
                         </div>
-                        <div className="flex justify-between text-xs text-gray-500">
+                        <div className="flex justify-between text-xs text-zinc-400 mt-1.5">
                           <span>{leftPct}%</span>
                           <span>{rightPct}%</span>
                         </div>
@@ -171,19 +154,22 @@ export default function StatsPage() {
                     );
                   })}
                 </div>
-              </div>
+              </section>
             )}
           </>
         ) : (
-          <div className="text-center py-20 text-gray-400">통계를 불러올 수 없습니다.</div>
+          <div className="py-20 text-center text-sm text-zinc-400">통계를 불러올 수 없습니다.</div>
         )}
 
-        <Link href="/test">
-          <Button className="w-full gap-2">
+        <div className="border-t border-zinc-100 pt-8">
+          <Link
+            href="/test"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-white bg-zinc-950 px-5 py-3 rounded-xl hover:bg-zinc-800 transition-colors"
+          >
             나도 테스트하기
-            <ArrowRight size={16} />
-          </Button>
-        </Link>
+            <ArrowRight size={15} />
+          </Link>
+        </div>
       </main>
     </div>
   );
