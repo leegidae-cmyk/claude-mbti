@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { Header } from '@/components/layout/header';
 import { mbtiTypeMap } from '@/data/mbti-types';
 import { MbtiCode } from '@/types/mbti';
@@ -20,6 +21,13 @@ const GROUP_ORDER: MbtiCode[] = [
   'ISTP', 'ISFP', 'ESTP', 'ESFP',
 ];
 
+const GROUPS = [
+  { label: '분석가', color: '#6366F1', types: ['INTJ', 'INTP', 'ENTJ', 'ENTP'] as MbtiCode[] },
+  { label: '외교관', color: '#EC4899', types: ['INFJ', 'INFP', 'ENFJ', 'ENFP'] as MbtiCode[] },
+  { label: '관리자', color: '#0EA5E9', types: ['ISTJ', 'ISFJ', 'ESTJ', 'ESFJ'] as MbtiCode[] },
+  { label: '탐험가', color: '#10B981', types: ['ISTP', 'ISFP', 'ESTP', 'ESFP'] as MbtiCode[] },
+];
+
 export default function StatsPage() {
   const [stats, setStats] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -32,6 +40,14 @@ export default function StatsPage() {
   }, []);
 
   const maxCount = stats ? Math.max(...Object.values(stats.distribution)) : 1;
+
+  const groupData = stats
+    ? GROUPS.map((g) => ({
+        label: g.label,
+        color: g.color,
+        count: g.types.reduce((sum, t) => sum + (stats.distribution[t] ?? 0), 0),
+      }))
+    : [];
 
   const axisStats = stats ? (() => {
     let E = 0, I = 0, S = 0, N = 0, T = 0, F = 0, J = 0, P = 0;
@@ -70,6 +86,66 @@ export default function StatsPage() {
           <div className="py-20 text-center text-sm text-zinc-400">불러오는 중...</div>
         ) : stats ? (
           <>
+            {/* 그룹 도넛 차트 */}
+            <section className="mb-12 border-b border-zinc-100 pb-12">
+              <p className="text-xs font-semibold tracking-widest uppercase text-zinc-400 mb-6">그룹별 비율</p>
+              <div className="flex items-center gap-8">
+                <div className="w-44 h-44 shrink-0">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={groupData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={52}
+                        outerRadius={72}
+                        paddingAngle={2}
+                        dataKey="count"
+                        startAngle={90}
+                        endAngle={-270}
+                      >
+                        {groupData.map((entry, index) => (
+                          <Cell key={index} fill={entry.color} stroke="none" />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        formatter={(value) => {
+                          const n = Number(value);
+                          return [`${n.toLocaleString()}명 (${((n / stats.total) * 100).toFixed(1)}%)`];
+                        }}
+                        contentStyle={{
+                          border: '1px solid #e4e4e7',
+                          borderRadius: '8px',
+                          fontSize: '12px',
+                          boxShadow: 'none',
+                        }}
+                        itemStyle={{ color: '#09090b' }}
+                        labelStyle={{ color: '#71717a', fontWeight: 600 }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+
+                <div className="flex-1 space-y-3">
+                  {groupData.map((g) => {
+                    const pct = ((g.count / stats.total) * 100).toFixed(1);
+                    return (
+                      <div key={g.label} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: g.color }} />
+                          <span className="text-sm font-medium text-zinc-700">{g.label}</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm font-bold text-zinc-950">{pct}%</span>
+                          <span className="text-xs text-zinc-400 w-20 text-right">{g.count.toLocaleString()}명</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </section>
+
             {/* 유형별 바 차트 */}
             <section className="mb-12">
               <p className="text-xs font-semibold tracking-widest uppercase text-zinc-400 mb-5">유형별 분포</p>
