@@ -18,7 +18,8 @@ export default function HomePage() {
   }, [hasProgress, currentQuestion]);
 
   useEffect(() => {
-    fetch('/api/stats')
+    const base = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+    fetch(`${base}/stats.json`)
       .then((r) => r.json())
       .then((data) => setTotalCount(data.total))
       .catch(() => {});
